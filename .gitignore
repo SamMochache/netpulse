@@ -1,2 +1,10 @@
 #virtual environment
 thread
+
+#migrations
+migrations/   
+*.sqlite3
+#pycache
+*.py[cod]
+*.pyo
+__pycache__/
