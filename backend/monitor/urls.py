@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import AdvancedScanView
+from .views import TriggerScanView
 
 urlpatterns = [
-    path('scan/', AdvancedScanView.as_view(), name='advanced-scan'),
+    path('trigger-scan/', TriggerScanView.as_view(), name='trigger-scan'),
+
 ]
