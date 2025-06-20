@@ -8,3 +8,6 @@ migrations/
 *.py[cod]
 *.pyo
 __pycache__/
+
+#environment variables
+.env

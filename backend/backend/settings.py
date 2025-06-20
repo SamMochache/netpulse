@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-mz08+5$uor!&&+$+nlfmtf8y$0%24s1)yf)@&^=oi-b1#767)=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # Allow all hosts for development; restrict in production
 
 
 # Application definition
@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'monitor',
+    'backend.monitor',
 ]
 
 MIDDLEWARE = [
@@ -58,14 +58,15 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # frontend
 ]
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
 
 AUTH_USER_MODEL = 'monitor.User'
 
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = 'backend.backend.urls'
 
 TEMPLATES = [
     {
@@ -82,7 +83,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'backend.backend.wsgi.application'
 
 
 # Database
