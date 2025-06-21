@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'backend.monitor',
+    'core.monitor',
 ]
 
 MIDDLEWARE = [
@@ -66,7 +66,7 @@ CELERY_TASK_SERIALIZER = 'json'
 AUTH_USER_MODEL = 'monitor.User'
 
 
-ROOT_URLCONF = 'backend.backend.urls'
+ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
@@ -83,7 +83,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.backend.wsgi.application'
+WSGI_APPLICATION = 'core.wsgi.application'
 
 
 # Database

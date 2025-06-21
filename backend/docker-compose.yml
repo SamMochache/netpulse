@@ -6,7 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: NETPULSE
-    command: gunicorn backend.backend.wsgi:application --bind 0.0.0.0:8000
+    #command: gunicorn backend.backend.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn backend.wsgi:application --chdir backend --bind 0.0.0.0:8000
+
     volumes:
       - .:/app
     ports:
@@ -28,7 +30,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: celery-worker
-    command: celery -A backend.backend worker --loglevel=info
+    #command: celery -A backend.backend worker --loglevel=info
+    command: celery -A backend worker --chdir backend --loglevel=info
+
     depends_on:
       - backend
       - redis

@@ -16,4 +16,6 @@ RUN pip install -r requirements.txt
 EXPOSE 8000
 
 # Start gunicorn server
-CMD ["gunicorn", "backend.backend.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "backend.backend.wsgi:application", "--chdir", "backend","--bind", "0.0.0.0:8000"]
+#CMD ["gunicorn", "backend.wsgi:application", "--chdir", "backend", "--bind", "0.0.0.0:8000"]
+
