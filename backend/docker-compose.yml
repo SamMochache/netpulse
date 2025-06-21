@@ -1,44 +1,34 @@
 version: "3.9"
 
 services:
-  backend:
+  web:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: NETPULSE
-    #command: gunicorn backend.backend.wsgi:application --bind 0.0.0.0:8000
-    command: gunicorn backend.wsgi:application --chdir backend --bind 0.0.0.0:8000
-
+    container_name: backend_web
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/app
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     depends_on:
       - redis
-    environment:
-      - DJANGO_SETTINGS_MODULE=backend.backend.settings
-      - PYTHONPATH=/app
 
-  redis:
-    image: redis:alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-
-  celery:
+  worker:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: celery-worker
-    #command: celery -A backend.backend worker --loglevel=info
-    command: celery -A backend worker --chdir backend --loglevel=info
-
-    depends_on:
-      - backend
-      - redis
+    container_name: celery_worker
+    command: celery -A core worker --loglevel=info
     volumes:
       - .:/app
-    environment:
-      - DJANGO_SETTINGS_MODULE=backend.backend.settings
-      - PYTHONPATH=/app
+    env_file:
+      - .env
+    depends_on:
+      - redis
 
+  redis:
+    image: redis:7
+    container_name: redis_broker
+    ports:
+      - "6379:6379"

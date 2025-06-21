@@ -1,21 +1,20 @@
-# Use a lightweight Python base
+# backend/Dockerfile
+
 FROM python:3.11-slim
 
-# Create app directory
-WORKDIR /app
-ENV PYTHONPATH="/app"
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# Copy code
-COPY . .
+# Set work directory
+WORKDIR /app
 
 # Install dependencies
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Port for Django app
-EXPOSE 8000
+# Copy entire project
+COPY . .
 
-# Start gunicorn server
-CMD ["gunicorn", "backend.backend.wsgi:application", "--chdir", "backend","--bind", "0.0.0.0:8000"]
-#CMD ["gunicorn", "backend.wsgi:application", "--chdir", "backend", "--bind", "0.0.0.0:8000"]
-
+# Run the Django app by default
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
