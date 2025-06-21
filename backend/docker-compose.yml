@@ -1,10 +1,9 @@
-
 services:
   web:
     build:
       context: .
     container_name: backend_web
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 3 --reload
     volumes:
       - .:/app
     ports:
@@ -18,7 +17,7 @@ services:
     build:
       context: .
     container_name: celery_worker
-    command: celery -A core worker --loglevel=info
+    command: celery -A core worker --loglevel=info --concurrency=2
     volumes:
       - .:/app
     env_file:
@@ -27,8 +26,17 @@ services:
       - redis
 
   redis:
-    image: redis:7
+    image: redis:7-alpine
     container_name: redis_broker
-    command: redis-server --requirepass ${REDIS_PASSWORD}
+    command: >
+      sh -c "
+        if [ -n \"$$REDIS_PASSWORD\" ]; then
+          redis-server --requirepass $$REDIS_PASSWORD
+        else
+          redis-server
+        fi
+      "
     env_file:
       - .env
+    ports:
+      - "6379:6379"  # Expose Redis port for debugging

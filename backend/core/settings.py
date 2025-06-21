@@ -1,3 +1,4 @@
+# backend/core/settings.py
 """
 Django settings for core project.
 """
@@ -9,7 +10,7 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("DJANGO_SECRET_KEY",)
+SECRET_KEY = config("DJANGO_SECRET_KEY", default="your-fallback-secret-key-here")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", "True") == "True"
@@ -45,16 +46,44 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# CORS
+# CORS settings
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Frontend (Vite)
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",  # Alternative React port
+    "http://127.0.0.1:3000",
 ]
 
-REDIS_PASSWORD = config("REDIS_PASSWORD")  # fallback for dev
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only in development
 
-CELERY_BROKER_URL = f'redis://:{REDIS_PASSWORD}@redis:6379/0'
+# REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+}
+
+# Celery Configuration
+REDIS_PASSWORD = config("REDIS_PASSWORD", default="")
+
+if REDIS_PASSWORD:
+    CELERY_BROKER_URL = f'redis://:{REDIS_PASSWORD}@redis:6379/0'
+    CELERY_RESULT_BACKEND = f'redis://:{REDIS_PASSWORD}@redis:6379/0'
+else:
+    CELERY_BROKER_URL = 'redis://redis:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
 
 # Custom user model
 AUTH_USER_MODEL = 'monitor.User'
@@ -66,10 +95,11 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Optional: add if you use custom templates
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -112,6 +142,36 @@ USE_TZ = True
 
 # Static files
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default auto field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'celery': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+# ============================================
