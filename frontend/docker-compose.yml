@@ -1,0 +1,37 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: netpulse_frontend
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - netpulse_network
+
+  # Development service (optional - for development with hot reload)
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: netpulse_frontend_dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://0.0.0.0:8000
+    restart: unless-stopped
+    networks:
+      - netpulse_network
+    profiles:
+      - dev
+
+networks:
+  netpulse_network:
+    external: true
